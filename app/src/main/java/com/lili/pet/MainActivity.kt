@@ -29,7 +29,7 @@ class MainActivity : Activity() {
         btnToggle = findViewById(R.id.btnToggle)
         tvStatus = findViewById(R.id.tvStatus)
         btnToggle.setOnClickListener {
-            if (isOverlayEnabled()) stopPet() else startPet()
+            if (OverlayService.isRunning(this)) stopPet() else startPet()
         }
         findViewById<Button>(R.id.btnOverlayPerm).setOnClickListener { requestOverlayPermission() }
         findViewById<Button>(R.id.btnUsagePerm).setOnClickListener { requestUsageAccess() }
