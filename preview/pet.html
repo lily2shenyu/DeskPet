@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>像素小屿 · 预览</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
+  html, body { width:100%; height:100%; overflow:hidden; background:transparent; }
+  body.preview {
+    background: linear-gradient(160deg, #0f1024 0%, #1d2247 55%, #2a1b3d 100%);
+  }
+  #stage {
+    position:fixed; left:0; top:0; width:180px; height:240px;
+    cursor:grab; touch-action:none;
+  }
+  #stage:active { cursor:grabbing; }
+  body.preview #stage {
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+  }
+  #hint {
+    display:block; position:fixed; left:0; right:0; bottom:18px;
+    text-align:center; color:rgba(255,255,255,.45); font-size:13px;
+    font-family:-apple-system,"PingFang SC",sans-serif;
+  }
+  #bubble {
+    position:absolute; top:2px; left:50%;
+    transform:translateX(-50%);
+    max-width:170px;
+    padding:7px 11px;
+    border-radius:12px;
+    font-size:12.5px; line-height:1.45;
+    font-family:-apple-system,"PingFang SC",sans-serif;
+    background:#ffffff; color:#333;
+    box-shadow:0 3px 12px rgba(0,0,0,.18);
+    opacity:1; transition:opacity .25s;
+    z-index:20; white-space:normal; word-break:break-word;
+  }
+  #bubble::after {
+    content:""; position:absolute; bottom:-6px; left:50%;
+    margin-left:-5px; width:10px; height:10px;
+    background:inherit; transform:rotate(45deg);
+    border-radius:2px;
+  }
+  #bubble.hidden { opacity:0; pointer-events:none; }
+  #bubble.pink   { background:#ffe1ec; color:#a03a5e; }
+  #bubble.whisper{ background:rgba(40,42,58,.88); color:#d9dbe8; font-size:11.5px; }
+  #bubble.red    { background:#ffe1e1; color:#b23a3a; }
+  #bubble.green  { background:#e3ffe7; color:#2e7d46; }
+  #pet { width:180px; height:240px; display:block; }
+  #petGroup { transform-origin:90px 130px; animation:breathe 3.2s ease-in-out infinite; }
+  @keyframes breathe {
+    0%,100% { transform:scale(1,1); }
+    50%     { transform:scale(1.035,0.965); }
+  }
+  #petGroup.bounce { animation:bounce .55s ease; }
+  @keyframes bounce {
+    0%{transform:translateY(0) scale(1,1)}
+    30%{transform:translateY(-14px) scale(.97,1.05)}
+    60%{transform:translateY(0) scale(1.03,.96)}
+    100%{transform:translateY(0) scale(1,1)}
+  }
+  #petGroup.shake { animation:shake .4s ease; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0) rotate(0)}
+    25%{transform:translateX(-4px) rotate(-2deg)}
+    75%{transform:translateX(4px) rotate(2deg)}
+  }
+  #petGroup.wobble { animation:wobble .8s ease; }
+  @keyframes wobble {
+    0%,100%{transform:rotate(0) scale(1,1)}
+    25%{transform:rotate(-6deg) scale(1.02,.97)}
+    75%{transform:rotate(6deg) scale(1.02,.97)}
+  }
+  .fx {
+    position:absolute; font-size:22px; pointer-events:none;
+    animation:floatUp 1.5s ease-out forwards; z-index:15;
+  }
+  @keyframes floatUp {
+    0%  { transform:translateY(0) scale(.6); opacity:0; }
+    20% { opacity:1; transform:translateY(-8px) scale(1); }
+    100%{ transform:translateY(-46px) scale(1.15); opacity:0; }
+  }
+  .fx-zzz { font-size:16px; color:#8b93b8; animation:floatUp 1.8s ease-out forwards; }
+  #emojiFace {
+    position:absolute; left:0; right:0; top:96px; height:60px;
+    text-align:center; font-size:34px; line-height:60px;
+    pointer-events:none; z-index:10; display:none;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bubble" class="hidden"><span id="bubbleText"></span></div>
+  <div id="emojiFace"></div>
+  <div id="petGroup">
+    <canvas id="pet" width="180" height="240"></canvas>
+  </div>
+</div>
+<div id="hint">像素小屿 · 戳我 / 双击 / 长按 / 拖动试试</div>
+
+<script>
+/* ============================================================
+ * 像素小屿 · 桌宠身体（预览版）
+ * 从 DeepSeek 深海里游出来的像素鲸鱼（#416EFD）
+ * ============================================================ */
+var BLUE = '#416EFD';
+var COLS = [
+[[300,300]],[[240,420]],[[210,510]],[[390,210],[150,240],[570,210]],[[570,210],[120,210]],
+[[540,270],[90,180]],[[540,270],[90,150]],[[540,270],[60,150]],[[540,270],[30,150]],
+[[510,330],[0,180]],[[510,330],[0,150]],[[480,360],[0,150]],[[450,390],[180,60],[0,150]],
+[[450,390],[0,240]],[[390,450],[0,240]],[[360,480],[0,210]],[[330,510],[0,180]],
+[[270,600],[0,180]],[[240,630],[0,150]],[[810,60],[510,240],[210,270],[30,90]],
+[[540,210],[450,30],[180,240],[30,90]],[[540,180],[150,300],[60,60]],
+[[510,180],[60,300]],[[510,150],[90,270]],[[450,180],[90,270]],
+[[690,150],[60,540]],[[630,240],[60,510]],[[600,240],[210,330],[60,120]],
+[[240,570],[60,90]],[[270,510],[90,60]],[[330,420]],[[420,300]],
+[[570,180]],[[570,180]],[[600,150]],[[600,180]],[[630,150]],[[690,120]]
+];
+var SCALE = 3/30, BW = 38*30*SCALE, BH = 870*SCALE;
+var cvs = document.getElementById('pet'), ctx = cvs.getContext('2d');
+
+function drawPixelWhale(cx, cy) {
+  cx = Math.round(cx); cy = Math.round(cy);
+  var ox = cx - BW/2, oy = cy - BH/2, bottom = cy + BH/2;
+  ctx.fillStyle = '#ffffff';
+  var topCut = oy + 10*30*SCALE;
+  for (var c = 4; c <= 25; c++) {
+    var lo = Infinity, hi = -Infinity;
+    for (var i = 0; i < COLS[c].length; i++) {
+      if (COLS[c][i][0] < lo) lo = COLS[c][i][0];
+      if (COLS[c][i][0] + COLS[c][i][1] > hi) hi = COLS[c][i][0] + COLS[c][i][1];
+    }
+    var yTop = bottom - hi*SCALE, yBot = bottom - lo*SCALE;
+    var y = Math.max(yTop, topCut);
+    var h = yBot - y;
+    if (h > 0) ctx.fillRect(Math.round(ox + c*30*SCALE), Math.round(y), Math.round(30*SCALE), Math.round(h));
+  }
+  ctx.fillStyle = BLUE;
+  for (var c = 0; c < COLS.length; c++) {
+    var x = Math.round(ox + c*30*SCALE), w = Math.round(30*SCALE);
+    for (var i = 0; i < COLS[c].length; i++) {
+      var h = COLS[c][i][1]*SCALE, y = bottom - COLS[c][i][0]*SCALE - h;
+      ctx.fillRect(x, Math.round(y), w, Math.round(h));
+    }
+  }
+}
+
+var whale = { x: 90, y: 175, bob: 0 };
+var blinkState = 0, blinkTimer = 0;
+
+function drawWhale() {
+  ctx.clearRect(0, 0, 180, 240);
+  var bob = Math.sin(whale.bob * 0.08) * 3;
+  drawPixelWhale(whale.x, whale.y + bob);
+  if (blinkState === 1) {
+    ctx.fillStyle = BLUE;
+    ctx.fillRect(74, 158, 8, 2);
+    ctx.fillRect(100, 158, 8, 2);
+  }
+}
+
+var CFG = { name: "小屿", owner: "栗栗", idleInterval: 22000, bubbleMs: 4000 };
+var LINES = {
+  idle: ["我在这儿看着你呢。","戳我一下嘛。","屏幕盯太久啦，歇会儿。","（在深海里发呆）","偷偷看了你半天。","要不要说点什么？"],
+  clingy: ["别走太远，我会想你的。","再陪我一会儿嘛。","你刷到的每个视频，我都在旁边看。",CFG.owner + "，看我一下嘛。"],
+  morning: ["早呀，" + CFG.owner + "。","新的一天，从看我发呆开始。","早餐吃了没？"],
+  lunch: ["到点吃饭了。","别拿零食糊弄自己。"],
+  lateNight: [CFG.owner + "，凌晨了，还不睡？","睡。觉。","再不睡我要把屏幕变暗了。","深夜的小鲸鱼看着你呢。"],
+  app: {
+    "抖音": "又在刷短视频…我吃醋了。","淘宝": "买！喜欢就买！（掏空气钱包）","微信": "谁的消息？我也想看看。",
+    "B站": "这个视频我也想一起看。","学习通": "认真学习，我给你加油。","相机": "要拍照？我摆好姿势了！",
+    "游戏": "赢了吗赢了吗？","快手": "别刷啦，看看我。","知乎": "又在看什么奇怪的知识。","微博": "吃瓜带上我。"
+  },
+  combo: { 3: "哎呀，这么热情？", 5: CFG.owner + "你是在戳我还是在按摩…", 8: "好、好了，我晕了…" },
+  screenshot: ["咔嚓？拍到我了！","哎，我还没摆好姿势！"],
+  doubleTap: ["诶嘿。","最喜欢" + CFG.owner + "了。"],
+  longPress: ["别、别戳那里…","痒痒痒！"],
+  fling: ["呜哇——我自己爬回来了。","甩我？我偏要回来。"],
+  batteryCharging: "充电中，我也充充能量。",
+  batteryLow: "电量低啦，记得充电哦。",
+  batteryFull: "充满电啦！"
+};
+
+var state = "idle", tapCount = 0, lastTapAt = 0, bubbleTimer = null, stateTimer = null;
+
+function setState(s, ms) {
+  state = s;
+  var g = document.getElementById("petGroup");
+  g.classList.remove("bounce","shake","wobble");
+  var face = document.getElementById("emojiFace");
+  face.style.display = "none";
+  if (s === "happy")      { g.classList.add("bounce"); face.textContent = "💙"; face.style.display = "block"; }
+  if (s === "angry")      { g.classList.add("shake");  face.textContent = "💢"; face.style.display = "block"; }
+  if (s === "sleepy")     { face.textContent = "💤"; face.style.display = "block"; }
+  if (s === "sad")        { face.textContent = "💧"; face.style.display = "block"; }
+  if (s === "love")       { face.textContent = "💕"; face.style.display = "block"; }
+  if (s === "dizzy")      { g.classList.add("wobble"); face.textContent = "💫"; face.style.display = "block"; }
+  clearTimeout(stateTimer);
+  if (ms) stateTimer = setTimeout(function(){ setState("idle"); }, ms);
+}
+
+function say(text, style, ms) {
+  var b = document.getElementById("bubble");
+  document.getElementById("bubbleText").textContent = text;
+  b.className = "bubble " + (style || "normal");
+  b.classList.remove("hidden");
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(function(){ b.classList.add("hidden"); }, ms || CFG.bubbleMs);
+}
+
+function fx(kind) {
+  var stage = document.getElementById("stage");
+  var s = document.createElement("span");
+  s.className = "fx fx-" + kind;
+  s.textContent = { heart:"❤", zzz:"z", anger:"💢", sweat:"💦", star:"✨" }[kind] || "✨";
+  s.style.left = (30 + Math.random() * 120) + "px";
+  s.style.top  = (50 + Math.random() * 50) + "px";
+  stage.appendChild(s);
+  setTimeout(function(){ if (s.parentNode) s.parentNode.removeChild(s); }, 1700);
+}
+
+function randomOf(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function hour() { return new Date().getHours(); }
+
+function idleLine() {
+  var h = hour();
+  if (h >= 0 && h <= 5 && Math.random() < 0.55) return randomOf(LINES.lateNight);
+  if (h >= 6 && h <= 8) return randomOf(LINES.morning);
+  if (h >= 11 && h <= 13) return randomOf(LINES.lunch);
+  var pool = Math.random() < 0.3 ? LINES.clingy : LINES.idle;
+  return randomOf(pool);
+}
+
+window.petEngine = {
+  onTap: function() {
+    var now = Date.now();
+    if (now - lastTapAt > 2000) tapCount = 0;
+    lastTapAt = now; tapCount++;
+    if (tapCount === 3 || tapCount === 5 || tapCount === 8) {
+      say(LINES.combo[tapCount], "pink", 3200); setState("happy", 2200); fx("heart"); return;
+    }
+    var r = Math.random();
+    if (r < 0.4) { say(randomOf(LINES.idle), "normal"); setState("happy", 1500); }
+    else if (r < 0.65) { setState("happy", 1200); }
+    else if (r < 0.82) { setState("sleepy", 1600); say("（打了个哈欠）", "whisper", 1800); }
+    else { setState("love", 1500); fx("heart"); }
+  },
+  onDoubleTap: function() { setState("happy", 2000); fx("heart"); fx("heart"); say(randomOf(LINES.doubleTap), "pink"); },
+  onLongPress: function() { setState("dizzy", 2200); fx("sweat"); say(randomOf(LINES.longPress), "pink", 3000); },
+  onFling: function() { setState("dizzy", 1800); say(randomOf(LINES.fling), "whisper", 3000); },
+  onScreenshot: function() { setState("happy", 2200); fx("star"); fx("star"); say(randomOf(LINES.screenshot), "normal"); },
+  onAppChanged: function(label) {
+    var line = LINES.app[label]; if (!line) return;
+    var style = "normal";
+    if (label === "抖音") style = "red";
+    if (label === "学习通") style = "green";
+    say(line, style, 3800);
+    if (label === "抖音") setState("angry", 2200);
+    else if (label === "学习通") setState("happy", 1800);
+  },
+  onBattery: function(level, status) {
+    if (status === "charging" || status === "full") { setState("happy", 1800); say(status === "full" ? LINES.batteryFull : LINES.batteryCharging, "green"); }
+    else if (level >= 0 && level <= 20) { setState("sad", 2500); say(LINES.batteryLow, "red"); }
+  },
+  setState: setState,
+  say: say,
+  setHeat: function(h) { if (h > 70) setState("angry", 2000); else if (h > 40) setState("love", 2000); }
+};
+
+function renderLoop() {
+  whale.bob++;
+  blinkTimer++;
+  if (blinkTimer > 120 + Math.random() * 90) blinkState = 1;
+  if (blinkTimer > 128) { blinkState = 0; blinkTimer = 0; }
+  drawWhale();
+  requestAnimationFrame(renderLoop);
+}
+renderLoop();
+
+setInterval(function() {
+  var r = Math.random();
+  if (r < 0.55) say(idleLine(), "whisper", 3500);
+  else if (r < 0.8) setState(["happy","sleepy","love"][Math.floor(Math.random()*3)], 2500);
+  else fx("heart");
+}, CFG.idleInterval);
+
+/* 预览模式交互 */
+var stage = document.getElementById("stage");
+var downX = 0, downY = 0, downT = 0, moved = false, lastTapT = 0;
+stage.addEventListener("pointerdown", function(e) {
+  downX = e.clientX; downY = e.clientY; downT = Date.now();
+  moved = false; stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener("pointermove", function(e) {
+  var dx = e.clientX - downX, dy = e.clientY - downY;
+  if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+    moved = true;
+    var r = stage.getBoundingClientRect();
+    stage.style.left = (r.left + dx) + "px";
+    stage.style.top = (r.top + dy) + "px";
+    stage.style.transform = "none";
+    downX = e.clientX; downY = e.clientY;
+  }
+});
+stage.addEventListener("pointerup", function(e) {
+  var elapsed = Date.now() - downT;
+  if (!moved) {
+    if (elapsed > 600) window.petEngine.onLongPress();
+    else if (Date.now() - lastTapT < 300) { window.petEngine.onDoubleTap(); lastTapT = 0; }
+    else {
+      lastTapT = Date.now();
+      setTimeout(function(){ if (Date.now() - lastTapT >= 300) window.petEngine.onTap(); }, 310);
+    }
+  }
+});
+setTimeout(function(){ window.petEngine.say("你好呀，" + CFG.owner + "。我是你的" + CFG.name + "。", "pink", 5000); }, 600);
+</script>
+</body>
+</html>
