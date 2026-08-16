@@ -160,6 +160,10 @@ class OverlayService : Service() {
                     val dx = (event.rawX - initialTouchX).toInt()
                     val dy = (event.rawY - initialTouchY).toInt()
                     if (abs(dx) > MOVE_THRESHOLD || abs(dy) > MOVE_THRESHOLD) {
+                        if (!hasMoved) {
+                            // 刚被拎起来，先晕一下
+                            onDragStart()
+                        }
                         hasMoved = true
                         moveDx = dx
                         moveDy = dy
@@ -182,7 +186,12 @@ class OverlayService : Service() {
                         }
                     } else {
                         val dist = sqrt((moveDx * moveDx + moveDy * moveDy).toDouble())
-                        if (dist > FLING_VELOCITY && elapsed < FLING_TIME) onFling(moveDx, moveDy)
+                        if (dist > FLING_VELOCITY && elapsed < FLING_TIME) {
+                            onFling(moveDx, moveDy)
+                        } else {
+                            // 慢速拖动结束：晕完了，缓过来
+                            onDragEnd()
+                        }
                     }
                     true
                 }
@@ -212,6 +221,16 @@ class OverlayService : Service() {
         val targetY = maxOf(0, minOf(dpToPx(700), (params?.y ?: 0) + dy / 3))
         js("window.petEngine.onFling()")
         animateBack(targetX, targetY)
+    }
+
+    /** 被拎起来拖动：小屿晕一下。 */
+    private fun onDragStart() {
+        js("window.petEngine.onDragStart()")
+    }
+
+    /** 拖动结束松手：小屿缓过来，说句话。 */
+    private fun onDragEnd() {
+        js("window.petEngine.onDragEnd()")
     }
 
     private fun animateBack(tx: Int, ty: Int) {
