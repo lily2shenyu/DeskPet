@@ -56,9 +56,8 @@ class MusicSensor(private val context: Context) {
     /** 返回正在播放的第一首歌 (title, artist)，没有则 null。 */
     private fun currentTrack(): Pair<String, String>? {
         return try {
-            val sessions = msm.getActiveSessions(null)
-            for (token in sessions) {
-                val controller = MediaController(context, token)
+            val controllers = msm.getActiveSessions(null)
+            for (controller in controllers) {
                 val state = controller.playbackState ?: continue
                 if (state.state != PlaybackState.STATE_PLAYING) continue
                 val meta = controller.metadata ?: continue
