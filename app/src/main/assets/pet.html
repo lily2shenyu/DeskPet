@@ -105,7 +105,7 @@
     100%{ transform:translateY(-46px) scale(1.15); opacity:0; }
   }
   .fx-zzz { font-size:16px; color:#8b93b8; animation:floatUp 1.8s ease-out forwards; }
-  .fx-heart { font-size:20px; }
+  .fx-heart { font-size:20px; color:#ff8fab; }
 
   /* 像素表情叠加层 */
   #emojiFace {
@@ -377,7 +377,7 @@ function fx(kind) {
   var stage = document.getElementById("stage");
   var s = document.createElement("span");
   s.className = "fx fx-" + kind;
-  s.textContent = { heart:"❤", zzz:"z", anger:"💢", sweat:"💦", star:"✨" }[kind] || "✨";
+  s.textContent = { heart:"💗", zzz:"z", anger:"💢", sweat:"💦", star:"✨" }[kind] || "✨";
   s.style.left = (30 + Math.random() * 120) + "px";
   s.style.top  = (50 + Math.random() * 50) + "px";
   stage.appendChild(s);
