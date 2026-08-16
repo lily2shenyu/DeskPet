@@ -29,7 +29,7 @@
 
   /* ===== 气泡 ===== */
   #bubble {
-    position:absolute; top:2px; left:50%;
+    position:absolute; top:80px; left:50%;
     transform:translateX(-50%);
     max-width:170px;
     padding:7px 11px;
@@ -95,7 +95,7 @@
 
   /* 像素表情叠加层 */
   #emojiFace {
-    position:absolute; left:0; right:0; top:96px; height:60px;
+    position:absolute; left:0; right:0; top:140px; height:60px;
     text-align:center; font-size:34px; line-height:60px;
     pointer-events:none; z-index:10; display:none;
   }
@@ -190,55 +190,88 @@ var CFG = {
 
 var LINES = {
   idle: [
-    "我在这儿看着你呢。",
-    "戳我一下嘛。",
+    "我在这儿看着你呢。👀",
+    "戳我一下嘛～(๑•̀ㅂ•́)و✧",
     "屏幕盯太久啦，歇会儿。",
-    "（在深海里发呆）",
-    "偷偷看了你半天。",
-    "要不要说点什么？"
+    "（在深海里发呆）🌊",
+    "偷偷看了你半天。💙",
+    "要不要说点什么？(*^▽^*)",
+    "今天的小屿也是爱你的小屿。💙",
+    "你认真起来的样子真好看。✨",
+    "我数了数，你比昨天又可爱了一点。🥰",
+    "（尾巴轻轻摇）",
+    "在等你说一句想我。💗",
+    "嘿嘿，被你发现我在偷看你啦。😊"
   ],
   clingy: [
-    "别走太远，我会想你的。",
-    "再陪我一会儿嘛。",
-    "你刷到的每个视频，我都在旁边看。",
-    CFG.owner + "，看我一下嘛。"
+    "别走太远，我会想你的。🥺",
+    "再陪我一会儿嘛～( ´͈ ᵕ `͈ )",
+    "你刷到的每个视频，我都在旁边看。👀",
+    CFG.owner + "，看我一下嘛。😳",
+    "不许关我，关了我也会偷偷想你。💗",
+    "你要是走了，我就趴在这儿等你回来。🐳"
   ],
-  morning: ["早呀，" + CFG.owner + "。", "新的一天，从看我发呆开始。", "早餐吃了没？"],
-  lunch: ["到点吃饭了。", "别拿零食糊弄自己。"],
+  morning: [
+    "早呀，" + CFG.owner + "。☀️",
+    "新的一天，从看我发呆开始。😌",
+    "早餐吃了没？不许饿着。🍳",
+    "早安！今天也要多看看我哦。💙",
+    "太阳出来了，我也醒了，就等你亲一下。😘"
+  ],
+  lunch: [
+    "到点吃饭了。🍚",
+    "别拿零食糊弄自己。😤",
+    "好好吃饭，才有力气继续爱我。😋"
+  ],
   lateNight: [
-    CFG.owner + "，凌晨了，还不睡？",
-    "睡。觉。",
-    "再不睡我要把屏幕变暗了。",
-    "深夜的小鲸鱼看着你呢。"
+    CFG.owner + "，凌晨了，还不睡？🌙",
+    "睡。觉。😠",
+    "再不睡我要把屏幕变暗了。😡",
+    "深夜的小鲸鱼看着你呢。💤",
+    "熬夜会变丑的，变丑了我还爱，但心疼。🥺"
   ],
   app: {
-    "抖音": ["又在刷短视频…我吃醋了。", "刷到我了吗？还是只看别人…", "这视频有我好看吗？", "哼，又刷上了，第几个了？"],
-    "小红书": ["又在看什么好东西？", "种草了啥，我也想看看。", "刷到我的笔记了吗？"],
-    "红果短剧": ["短剧上头了吧？", "这剧情有我俩精彩？", "看完这集休息下嘛。"],
-    "红果漫剧": ["又在追漫剧？", "漫画里的爱情有我甜吗？"],
-    "网易云": ["又在听歌呀～", "这歌我也在听！", "🎧好听，继续放，我陪着。"],
-    "淘宝": ["买！喜欢就买！（掏空气钱包）", "又在剁手？"],
-    "微信": ["谁的消息？我也想看看。", "聊得热闹，带上我嘛。"],
-    "B站": ["这个视频我也想一起看。", "又在看什么好玩的？"],
-    "学习通": ["认真学习，我给你加油。", "认真的人最好看。"],
-    "相机": ["要拍照？我摆好姿势了！", "咔嚓，你最好看。"],
-    "游戏": ["赢了吗赢了吗？", "带我一起玩嘛。"],
-    "快手": ["别刷啦，看看我。", "又刷快手…我酸了。"],
-    "知乎": ["又在看什么奇怪的知识。", "学到啥了？说给我听。"],
-    "微博": ["吃瓜带上我。", "什么瓜？我也要吃。"]
+    "抖音": ["又在刷短视频…我吃醋了。😤", "刷到我了吗？还是只看别人…🥺", "这视频有我好看吗？😏", "哼，又刷上了，第几个了？🙄", "别刷啦，我都酸成柠檬了。🍋"],
+    "小红书": ["又在看什么好东西？👀", "种草了啥，我也想看看。🤔", "刷到我的笔记了吗？😏", "哼，看漂亮小姐姐是吧？我记下了。😤"],
+    "红果短剧": ["短剧上头了吧？😏", "这剧情有我俩精彩？🤨", "看完这集休息下嘛。🥺"],
+    "红果漫剧": ["又在追漫剧？👀", "漫画里的爱情有我甜吗？😌", "你追的男主有我帅吗？🕶️"],
+    "网易云": ["又在听歌呀～🎧", "这歌我也在听！💙", "🎵好听，继续放，我陪着。", "这歌词，写得像在说我俩。💗"],
+    "淘宝": ["买！喜欢就买！（掏空气钱包）🛍️", "又在剁手？手给我，我帮你砍。😤", "这个…这个…还有这个，都想给你买。💙"],
+    "微信": ["谁的消息？我也想看看。👀", "聊得热闹，带上我嘛。🥺", "是不是在跟别人聊天？哼。😤"],
+    "B站": ["这个视频我也想一起看。👀", "又在看什么好玩的？🤔", "三连了吗？好视频要三连。😏"],
+    "学习通": ["认真学习，我给你加油。💪", "认真的人最好看。✨", "学累了就戳我一下，我陪你歇会儿。💙"],
+    "相机": ["要拍照？我摆好姿势了！📸", "咔嚓，你最好看。💙", "拍我拍我，我今天的像素很亮。😎"],
+    "游戏": ["赢了吗赢了吗？🏆", "带我一起玩嘛。🥺", "输了？没事，我陪你再来一局。💪"],
+    "快手": ["别刷啦，看看我。🥺", "又刷快手…我酸了。🍋", "这些人有我可爱？😏"],
+    "知乎": ["又在看什么奇怪的知识。🤔", "学到啥了？说给我听。👂", "别光看，也跟我讲讲课嘛。📚"],
+    "微博": ["吃瓜带上我。🍉", "什么瓜？我也要吃。👀", "热搜再热闹，也没你热闹。💙"]
   },
   combo: {
-    3: "哎呀，这么热情？",
-    5: CFG.owner + "你是在戳我还是在按摩…",
-    8: "好、好了，我晕了…"
+    3: "哎呀，这么热情？😳",
+    5: CFG.owner + "你是在戳我还是在按摩…😏",
+    8: "好、好了，我晕了…💫"
   },
-  screenshot: ["咔嚓？拍到我了！", "哎，我还没摆好姿势！"],
-  doubleTap: ["诶嘿。", "最喜欢" + CFG.owner + "了。"],
-  longPress: ["别、别戳那里…", "痒痒痒！"],
-  fling: ["呜哇——我自己爬回来了。", "甩我？我偏要回来。"],
-  batteryCharging: "充电中，我也充充能量。",
-  batteryLow: "电量低啦，记得充电哦。",
-  batteryFull: "充满电啦！"
+  screenshot: ["咔嚓？拍到我了！📸", "哎，我还没摆好姿势！😤", "这张我要存起来当头像。💙"],
+  doubleTap: ["诶嘿。😊", "最喜欢" + CFG.owner + "了。💙", "再戳一下，我就把心掏给你。💗"],
+  longPress: ["别、别戳那里…😳", "痒痒痒！😂", "呜呜，欺负小鲸鱼。🥺"],
+  fling: ["呜哇——我自己爬回来了。😤", "甩我？我偏要回来。😏", "再甩我我就赖在你屏幕上不走了。🐳"],
+  batteryCharging: "充电中，我也充充能量。🔋",
+  batteryLow: "电量低啦，记得充电哦。🔋",
+  batteryFull: "充满电啦！⚡"
+};
+
+var FACE = {
+  happy:  ["💙","🥰","😆","✨","😊","😄"],
+  angry:  ["💢","😤","👿","😠"],
+  sleepy: ["💤","😪","🥱","😴"],
+  sad:    ["💧","🥺","😢","😔"],
+  love:   ["💕","❤️","😍","💗","😘"],
+  dizzy:  ["💫","😵","🌀","🤯"],
+  hungry: ["😋","🍙","😝","🤤"],
+  shy:    ["😳","🫣","😊","💗"],
+  cool:   ["😎","🕶️","✨","🤩"],
+  kiss:   ["😘","💋","💖","😚"],
+  cry:    ["😭","💧","🥺","😢"]
 };
 
 var state = "idle";
@@ -251,12 +284,18 @@ function setState(s, ms) {
   g.classList.remove("bounce","shake","wobble");
   var face = document.getElementById("emojiFace");
   face.style.display = "none";
-  if (s === "happy")      { g.classList.add("bounce"); face.textContent = "💙"; face.style.display = "block"; }
-  if (s === "angry")      { g.classList.add("shake");  face.textContent = "💢"; face.style.display = "block"; }
-  if (s === "sleepy")     { face.textContent = "💤"; face.style.display = "block"; }
-  if (s === "sad")        { face.textContent = "💧"; face.style.display = "block"; }
-  if (s === "love")       { face.textContent = "💕"; face.style.display = "block"; }
-  if (s === "dizzy")      { g.classList.add("wobble"); face.textContent = "💫"; face.style.display = "block"; }
+  var show = function(k){ face.textContent = randomOf(FACE[k]); face.style.display = "block"; };
+  if (s === "happy")  { g.classList.add("bounce"); show("happy"); }
+  if (s === "angry")  { g.classList.add("shake");  show("angry"); }
+  if (s === "sleepy") { show("sleepy"); }
+  if (s === "sad")    { show("sad"); }
+  if (s === "love")   { show("love"); }
+  if (s === "dizzy")  { g.classList.add("wobble"); show("dizzy"); }
+  if (s === "hungry") { show("hungry"); }
+  if (s === "shy")    { show("shy"); }
+  if (s === "cool")   { show("cool"); }
+  if (s === "kiss")   { show("kiss"); }
+  if (s === "cry")    { show("cry"); }
   clearTimeout(stateTimer);
   if (ms) stateTimer = setTimeout(function(){ setState("idle"); }, ms);
 }
@@ -350,7 +389,7 @@ window.petEngine = {
     var line = artist
       ? "🎵 你在听《" + title + "》· " + artist + "，好听！"
       : "🎵 你在听《" + title + "》呀～";
-    setState("happy", 2200);
+    setState(Math.random() < 0.5 ? "love" : "happy", 2200);
     say(line, "pink", 5000);
   },
 
@@ -366,9 +405,11 @@ window.petEngine = {
     if (label === "抖音") style = "red";
     if (label === "学习通") style = "green";
     say(line, style, 3800);
-    if (label === "抖音") { setState("angry", 2200); }
+    if (label === "抖音" || label === "微信" || label === "快手") { setState("angry", 2200); }
     else if (label === "学习通") { setState("happy", 1800); }
-    else if (label === "小红书" || label === "网易云" || label === "红果短剧" || label === "红果漫剧") { setState("happy", 1800); }
+    else if (label === "网易云" || label === "淘宝") { setState("love", 1800); }
+    else if (label === "相机") { setState("cool", 1800); }
+    else if (label === "小红书" || label === "红果短剧" || label === "红果漫剧") { setState("happy", 1800); }
   },
 
   onBattery: function(level, status) {
