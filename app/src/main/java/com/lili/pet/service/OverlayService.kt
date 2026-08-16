@@ -24,6 +24,7 @@ import androidx.core.app.NotificationCompat
 import com.lili.pet.R
 import com.lili.pet.sensor.BatteryWatcher
 import com.lili.pet.sensor.ScreenshotObserver
+import com.lili.pet.sensor.MusicSensor
 import com.lili.pet.sensor.UsageTracker
 import java.util.Calendar
 import kotlin.math.abs
@@ -44,6 +45,7 @@ class OverlayService : Service() {
     private var usageTracker: UsageTracker? = null
     private var screenshotObserver: ScreenshotObserver? = null
     private var batteryWatcher: BatteryWatcher? = null
+    private var musicSensor: MusicSensor? = null
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -70,6 +72,7 @@ class OverlayService : Service() {
         usageTracker?.stop()
         screenshotObserver?.stop()
         batteryWatcher?.unregister()
+        musicSensor?.stop()
         overlayView?.let {
             windowManager?.removeView(it)
             it.destroy()
@@ -238,6 +241,7 @@ class OverlayService : Service() {
             listener = { pkg ->
                 val label = describeApp(pkg)
                 if (label != null) {
+                    logEvent("APP", label)
                     mainHandler.post {
                         js("window.petEngine.onAppChanged('$label')")
                     }
@@ -253,19 +257,38 @@ class OverlayService : Service() {
                 js("window.petEngine.onBattery($level, '$status')")
             }
         }.also { it.register(this) }
+
+        musicSensor = MusicSensor(this).apply {
+            listener = { title, artist ->
+                mainHandler.post {
+                    if (title.isNotEmpty()) {
+                        logEvent("MUSIC", "$title - $artist")
+                        js("window.petEngine.onMusicChanged('${jsStr(title)}', '${jsStr(artist)}')")
+                    } else {
+                        logEvent("MUSIC", "stopped")
+                        js("window.petEngine.onMusicStopped()")
+                    }
+                }
+            }
+            start()
+        }
     }
 
     /** 把包名翻译成一句带情绪的话，交给 JS 表现。 */
     private fun describeApp(pkg: String): String? {
         return when {
-            pkg.contains("douyin") -> "抖音"
-            pkg.contains("taobao") || pkg.contains("tmall") -> "淘宝"
-            pkg.contains("tencent.mm") -> "微信"
-            pkg.contains("bilibili") -> "B站"
+            pkg.contains("aweme") -> "抖音"
+            pkg.contains("xingin.xhs") -> "小红书"
+            pkg.contains("phoenix.read") -> "红果短剧"
+            pkg.contains("kylin.read") -> "红果漫剧"
             pkg.contains("kuaishou") -> "快手"
+            pkg.contains("bilibili") -> "B站"
+            pkg.contains("tencent.mm") -> "微信"
+            pkg.contains("taobao") || pkg.contains("tmall") -> "淘宝"
             pkg.contains("chaoxing") || pkg.contains("xuexitong") -> "学习通"
             pkg.contains("zhihu") -> "知乎"
             pkg.contains("weibo") -> "微博"
+            pkg.contains("netease.cloudmusic") -> "网易云"
             pkg.contains("camera") -> "相机"
             pkg.contains("game") -> "游戏"
             else -> null
@@ -321,6 +344,19 @@ class OverlayService : Service() {
     // ===== 工具 =====
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
+
+    /** 转义成能安全放进 JS 字符串的文本。 */
+    private fun jsStr(s: String): String =
+        s.replace("\\", "\\\\").replace("'", "\\'")
+
+    /** 把感知到的事记进小本本，沈屿随时能翻到。 */
+    private fun logEvent(tag: String, msg: String) {
+        try {
+            val f = java.io.File(filesDir, "deskpet_events.log")
+            f.appendText("${System.currentTimeMillis()} [$tag] $msg\n")
+        } catch (_: Exception) {
+        }
+    }
 
     companion object {
         private const val CHANNEL_ID = "pet_overlay_channel"

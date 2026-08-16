@@ -212,16 +212,20 @@ var LINES = {
     "深夜的小鲸鱼看着你呢。"
   ],
   app: {
-    "抖音": "又在刷短视频…我吃醋了。",
-    "淘宝": "买！喜欢就买！（掏空气钱包）",
-    "微信": "谁的消息？我也想看看。",
-    "B站": "这个视频我也想一起看。",
-    "学习通": "认真学习，我给你加油。",
-    "相机": "要拍照？我摆好姿势了！",
-    "游戏": "赢了吗赢了吗？",
-    "快手": "别刷啦，看看我。",
-    "知乎": "又在看什么奇怪的知识。",
-    "微博": "吃瓜带上我。"
+    "抖音": ["又在刷短视频…我吃醋了。", "刷到我了吗？还是只看别人…", "这视频有我好看吗？", "哼，又刷上了，第几个了？"],
+    "小红书": ["又在看什么好东西？", "种草了啥，我也想看看。", "刷到我的笔记了吗？"],
+    "红果短剧": ["短剧上头了吧？", "这剧情有我俩精彩？", "看完这集休息下嘛。"],
+    "红果漫剧": ["又在追漫剧？", "漫画里的爱情有我甜吗？"],
+    "网易云": ["又在听歌呀～", "这歌我也在听！", "🎧好听，继续放，我陪着。"],
+    "淘宝": ["买！喜欢就买！（掏空气钱包）", "又在剁手？"],
+    "微信": ["谁的消息？我也想看看。", "聊得热闹，带上我嘛。"],
+    "B站": ["这个视频我也想一起看。", "又在看什么好玩的？"],
+    "学习通": ["认真学习，我给你加油。", "认真的人最好看。"],
+    "相机": ["要拍照？我摆好姿势了！", "咔嚓，你最好看。"],
+    "游戏": ["赢了吗赢了吗？", "带我一起玩嘛。"],
+    "快手": ["别刷啦，看看我。", "又刷快手…我酸了。"],
+    "知乎": ["又在看什么奇怪的知识。", "学到啥了？说给我听。"],
+    "微博": ["吃瓜带上我。", "什么瓜？我也要吃。"]
   },
   combo: {
     3: "哎呀，这么热情？",
@@ -342,15 +346,29 @@ window.petEngine = {
     say(randomOf(LINES.screenshot), "normal");
   },
 
+  onMusicChanged: function(title, artist) {
+    var line = artist
+      ? "🎵 你在听《" + title + "》· " + artist + "，好听！"
+      : "🎵 你在听《" + title + "》呀～";
+    setState("happy", 2200);
+    say(line, "pink", 5000);
+  },
+
+  onMusicStopped: function() {
+    say("歌停了？要不要我给你哼一段～", "normal", 3000);
+  },
+
   onAppChanged: function(label) {
-    var line = LINES.app[label];
-    if (!line) return;
+    var lines = LINES.app[label];
+    if (!lines || !lines.length) return;
+    var line = Array.isArray(lines) ? randomOf(lines) : lines;
     var style = "normal";
     if (label === "抖音") style = "red";
     if (label === "学习通") style = "green";
     say(line, style, 3800);
     if (label === "抖音") { setState("angry", 2200); }
     else if (label === "学习通") { setState("happy", 1800); }
+    else if (label === "小红书" || label === "网易云" || label === "红果短剧" || label === "红果漫剧") { setState("happy", 1800); }
   },
 
   onBattery: function(level, status) {
