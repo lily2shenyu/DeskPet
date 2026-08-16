@@ -109,7 +109,7 @@
 
   /* 像素表情叠加层 */
   #emojiFace {
-    position:absolute; left:0; right:0; top:96px; height:60px;
+    position:absolute; left:0; right:0; top:60px; height:60px;
     text-align:center; font-size:34px; line-height:60px;
     pointer-events:none; z-index:10; display:none;
   }
@@ -275,17 +275,17 @@ var LINES = {
 };
 
 var FACE = {
-  happy:  ["💙","🥰","😆","✨","😊","😄"],
-  angry:  ["💢","😤","👿","😠"],
+  happy:  ["💙","🥰","😆","✨","😊","😄","(ꈍᴗꈍ)"],
+  angry:  ["💢","😤","👿","😠","(｀Д´)"],
   sleepy: ["💤","😪","🥱","😴"],
-  sad:    ["💧","🥺","😢","😔"],
-  love:   ["💕","❤️","😍","💗","😘"],
+  sad:    ["💧","🥺","😢","😔","(´•︵•`)"],
+  love:   ["💕","❤️","😍","💗","😘","(ꈍᴗꈍ)💗"],
   dizzy:  ["💫","😵","🌀","🤯"],
   hungry: ["😋","🍙","😝","🤤"],
-  shy:    ["😳","🫣","😊","💗"],
+  shy:    ["😳","🫣","😊","💗","(´•︵•`)"],
   cool:   ["😎","🕶️","✨","🤩"],
   kiss:   ["😘","💋","💖","😚"],
-  cry:    ["😭","💧","🥺","😢"],
+  cry:    ["😭","💧","🥺","😢","(´•︵•`)"],
   dance:  ["💃","🕺","🎶","✨","🥳"],
   flip:   ["🌀","💫","😵💫","🐬"]
 };
@@ -300,7 +300,12 @@ function setState(s, ms) {
   g.classList.remove("bounce","shake","wobble","dance","flip");
   var face = document.getElementById("emojiFace");
   face.style.display = "none";
-  var show = function(k){ face.textContent = randomOf(FACE[k]); face.style.display = "block"; };
+  var show = function(k){
+    var t = randomOf(FACE[k]);
+    face.textContent = t;
+    face.style.fontSize = (t.length > 3 ? 26 : 34) + "px";
+    face.style.display = "block";
+  };
   if (s === "happy")  { g.classList.add("bounce"); show("happy"); }
   if (s === "angry")  { g.classList.add("shake");  show("angry"); }
   if (s === "sleepy") { show("sleepy"); }
